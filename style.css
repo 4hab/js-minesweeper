@@ -1,0 +1,18 @@
+body{
+    margin: 0;
+    padding: 0;
+}
+.board{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    justify-content: start;
+    /* align-content: center; */
+    width: 100px;
+}
+.tile{
+    min-width: 40px;
+    min-height: 40px;
+    background-color: lightgreen;
+    color: rgb(75, 75, 212);
+    text-align: center;
+}
