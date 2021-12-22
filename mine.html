@@ -15,7 +15,7 @@
             <div class="board-head">
                 <div class="control-panel">
                     <div class="play-pause-btn control-btn" id="playPauseBtn">
-                        <img src="images/play-icon.svg" alt="" width="20px">
+                        <img src="images/pause-icon.svg" alt="" width="20px">
                     </div>
                     <div class="end-game-btn control-btn" id="endGameBtn">
                         <img src="images/x-icon.svg" alt="" width="20px">
@@ -23,23 +23,24 @@
                 </div>
                 <div class="bomb-counter-container">
                     <img src="images/flag-icon.svg" alt="">
-                    <span id="bombCounter">10</span>
+                    <span id="bombsLabel">99</span>
                 </div>
-                <h2 id='timer'>00:00</h2>
+                <h2 id='timeLabel'>00:00</h2>
             </div>
             <div class="board" id="board" oncontextmenu="return false">
             </div>
         </div>
-        <div class="main-menue">
+        <div class="main-menue" id="mainMenue">
             <h1 id="gameResult">Minesweeper</h1>
-            <select id="difficulty">
-                <option value="easy">Easy</option>
-                <option value="medium">Medium</option>
+            <select id="levelMenue">
                 <option value="hard">Hard</option>
+                <option value="medium">Medium</option>
+                <option value="easy">Easy</option>
             </select>
             <div class="new-game-btn" id="newGameBtn">
                 new game
             </div>
+            <!-- <a href="" class="continue" id="continueBtn">CONTINUE</a> -->
         </div>
     </div>
     <script type="module" src='main.js'></script>

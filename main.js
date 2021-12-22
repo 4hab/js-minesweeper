@@ -1,32 +1,33 @@
 import { Tile, Coordinates } from './tile.js';
+let levels = {
+    'easy': {
+        'columns': 10,
+        'rows': 8,
+        'bombs': 10
+    },
+    'medium': {
+        'columns': 18,
+        'rows': 14,
+        'bombs': 40
+    },
+    'hard': {
+        'columns': 24,
+        'rows': 20,
+        'bombs': 99
+    }
+};
+let colors = ['black', 'crimson', 'darkslateblue', 'green', 'orangered', 'darkmagenta', 'brown', 'green', 'tomato'];
 
 class Game {
     board;
-    columns
-    rows
-    bombs
-    levels = {
-        'easy': {
-            'columns': 10,
-            'rows': 8,
-            'bombs': 10
-        },
-        'medium': {
-            'columns': 18,
-            'rows': 14,
-            'bombs': 40
-        },
-        'hard': {
-            'columns': 24,
-            'rows': 20,
-            'bombs': 99
-        }
-    };
-    level
-    colors = ['black', 'crimson', 'darkslateblue', 'green', 'orangered', 'darkmagenta', 'brown', 'green', 'tomato'];
+    columns;
+    rows;
+    bombs;
+    level;
+    coveredTiles;
 
     constructor(difficulty) {
-        this.level = this.levels[difficulty];
+        this.level = levels[difficulty];
         this.columns = this.level['columns'];
         this.rows = this.level['rows'];
         this.bombs = this.level['bombs'];
@@ -46,7 +47,9 @@ class Game {
     }
     newGame() {
         let rows = this.rows, columns = this.columns;
+        this.coveredTiles = rows * columns - this.bombs;
         let boardDiv = document.getElementById('board');
+        boardDiv.innerHTML = '';
         boardDiv.style.gridTemplateColumns = 'repeat(' + columns + ', 1fr)';
         boardDiv.style.width = columns * 33 + 'px';
         this.board = new Array(rows);
@@ -90,13 +93,6 @@ class Game {
                 }
             }
         }
-        // for (let row = 0; row < rows; row++) {
-        //     for (let col = 0; col < columns; col++) {
-        //         if (this.board[row][col].containsBomb()) {
-        //             console.log(this.board[row][col].getCoordinates())
-        //         }
-        //     }
-        // }
     }
     open(r, c) {
         let tile = this.board[r][c];
@@ -110,6 +106,7 @@ class Game {
         }
     }
     #openBomb(tileElement) {
+        console.log('Loser');
         let img = document.createElement('img');
         img.src = 'images/bug-icon.svg';
         img.style.width = '100%';
@@ -121,6 +118,12 @@ class Game {
         if (tile.open || tile.flag)
             return;
         tile.open = true;
+        this.coveredTiles--;
+        console.log(this.coveredTiles);
+        if(this.coveredTiles==0){
+            //winner
+            console.log('winner');
+        }
         let tileElement = tile.htmlElement();
         let coordinates = tile.getCoordinates();
         let r = coordinates.x();
@@ -129,7 +132,7 @@ class Game {
         if (tile.getValue() > 0) {
             let value = tile.getValue();
             tileElement.innerHTML = value;
-            tileElement.style.color = this.colors[value];
+            tileElement.style.color = colors[value];
             tileElement.style.padding = '0px';
         }
         else {
@@ -145,10 +148,13 @@ class Game {
     }
     putFlag(r, c) {
         let tile = this.board[r][c];
+        if (tile.open)
+            return;
         let tileElement = tile.htmlElement();
         if (tile.flag) {
             tile.flag = false;
             tileElement.innerHTML = '';
+            this.bombs++;
         }
         else {
             tile.flag = true;
@@ -158,15 +164,12 @@ class Game {
             img.style.padding = '5px';
             tileElement.appendChild(img);
             tileElement.style.padding = '0px';
+            this.bombs--;
         }
-
+        bombsLabel.innerHTML = this.bombs;
     }
-
-
 }
 
-//e.button => 0 left click
-//e.button => 2 right click
 function tileClick(e) {
     let tile = e.srcElement;
     if (e.srcElement.tagName != 'DIV') {
@@ -182,7 +185,67 @@ function tileClick(e) {
     }
 }
 
-let game = new Game('hard');
+var game = new Game('hard');
+let mainMenue = document.getElementById('mainMenue');
+let levelMenue = document.getElementById('levelMenue');
+let newGameBtn = document.getElementById('newGameBtn');
+let playPauseBtn = document.getElementById('playPauseBtn');
+let endGameBtn = document.getElementById('endGameBtn');
+let timeLabel = document.getElementById('timeLabel');
+let bombsLabel = document.getElementById('bombsLabel');
+let continueBtn = document.getElementById('continueBtn');
+let timer;
+let time = {
+    'seconds': 0,
+    'minutes': 0,
+};
+function startTimer() {
+    timer = setInterval(function (params) {
+        timeLabel.innerHTML = getTime();
+    }, 1000);
+    playPauseBtn.children[0].src = 'images/pause-icon.svg';
+}
+function stopTimer() {
+    clearInterval(timer);
+    playPauseBtn.children[0].src = 'images/play-icon.svg';
+    mainMenue.style.display = 'flex';
+}
+function getTime() {
+    let seconds = time['seconds'], minutes = time['minutes'];
+    time['seconds']++;
+    if (time['seconds'] == 60) {
+        time['minutes']++;
+        time['seconds'] = 0;
+    }
+    return (minutes < 10 ? '0' + minutes : minutes) + ':' + (seconds < 10 ? '0' + seconds : seconds);
+}
+levelMenue.onchange = function (e) {
+    let level = e.srcElement.value;
+    bombsLabel.innerHTML = levels[level]['bombs'];
+}
+newGameBtn.onclick = function () {
+    game = new Game(levelMenue.value);
+    mainMenue.style.display = 'none';
+    startTimer();
+    pause = false;
+    time['seconds'] = 0;
+    time['minutes'] = 0;
+}
+let pause = true;
+playPauseBtn.onclick = function () {
+    if (pause)
+        startTimer();
+    else
+        stopTimer();
+    pause = !pause;
+}
+
+
+
+
+
+
+
 
 
 
