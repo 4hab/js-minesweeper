@@ -182,7 +182,7 @@ function tileClick(e) {
     }
 }
 
-let game = new Game('medium');
+let game = new Game('hard');
 
 
 
