@@ -12,19 +12,18 @@
 <body>
     <div class="container">
         <div class="game-container">
-            <div class="control-panel">
-                <div class="play-pause-btn control-btn" id="playPauseBtn">
-                    <img src="images/play-icon.svg" alt="" width="20px">
-                </div>
-                <div class="end-game-btn control-btn" id="endGameBtn">
-                    <img src="images/x-icon.svg" alt="" width="20px">
-                </div>
+        <div class="control-panel">
+            <div class="play-pause-btn control-btn" id="playPauseBtn">
+                <img src="images/play-icon.svg" alt="" width="20px">
             </div>
-            <div class="board" id="board">
+            <div class="end-game-btn control-btn" id="endGameBtn">
+                <img src="images/x-icon.svg" alt="" width="20px">
             </div>
         </div>
+        <div class="board" id="board" oncontextmenu="return false">
+        </div></div>
     </div>
-    <script src='main.js'></script>
+    <script type="module" src='main.js'></script>
 </body>
 
 </html>
