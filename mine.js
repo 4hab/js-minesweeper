@@ -25,12 +25,14 @@ class Game {
     bombs;
     level;
     coveredTiles;
+    status;
 
     constructor(difficulty) {
         this.level = levels[difficulty];
         this.columns = this.level['columns'];
         this.rows = this.level['rows'];
         this.bombs = this.level['bombs'];
+        this.status = 'playing';
         this.newGame();
     }
 
@@ -103,16 +105,22 @@ class Game {
         }
         else {
             this.#openEmpty(tile);
+            let audio = new Audio('sounds/pop2.mp3');
+            if(tile.getValue()){
+                audio = new Audio('sounds/pop.mp3');
+            }
+            audio.play();
         }
     }
     #openBomb(tileElement) {
-        console.log('Loser');
         let img = document.createElement('img');
         img.src = 'images/bug-icon.svg';
         img.style.width = '100%';
         img.style.padding = '8px';
         tileElement.appendChild(img);
         tileElement.style.padding = '0px';
+        console.log('Loser');
+        this.status = 'game over';
     }
     #openEmpty(tile) {
         if (tile.open || tile.flag)
@@ -121,8 +129,7 @@ class Game {
         this.coveredTiles--;
         console.log(this.coveredTiles);
         if(this.coveredTiles==0){
-            //winner
-            console.log('winner');
+            this.status = 'winner';
         }
         let tileElement = tile.htmlElement();
         let coordinates = tile.getCoordinates();
@@ -150,6 +157,8 @@ class Game {
         let tile = this.board[r][c];
         if (tile.open)
             return;
+        let audio = new Audio('sounds/flag.mp3');
+        audio.play();
         let tileElement = tile.htmlElement();
         if (tile.flag) {
             tile.flag = false;
@@ -170,22 +179,9 @@ class Game {
     }
 }
 
-function tileClick(e) {
-    let tile = e.srcElement;
-    if (e.srcElement.tagName != 'DIV') {
-        tile = e.srcElement.parentElement;
-    }
-    let id = parseInt(tile.id);
-    let r = Math.floor(id / game.columns), c = id % game.columns;
-    if (e.button == 0) {
-        game.open(r, c);
-    }
-    else if (e.button == 2) {
-        game.putFlag(r, c);
-    }
-}
 
 var game = new Game('hard');
+let gameResult = document.getElementById('gameResult');
 let mainMenue = document.getElementById('mainMenue');
 let levelMenue = document.getElementById('levelMenue');
 let newGameBtn = document.getElementById('newGameBtn');
@@ -199,6 +195,39 @@ let time = {
     'seconds': 0,
     'minutes': 0,
 };
+
+function checkGame(){
+    let status = game.status;
+    if(status == 'playing'){
+        return;
+    }
+    gameResult.innerHTML = status;
+    mainMenue.style.display = 'flex';
+    mainMenue.className = 'main-menue result-menue';
+    stopTimer();
+    let audio = new Audio('sounds/defeat.mp3');
+    if(status == 'winner'){
+        audio = new Audio('sounds/victory.mp3');
+    }
+    audio.play();
+}
+function tileClick(e) {
+    let tile = e.srcElement;
+    if (e.srcElement.tagName != 'DIV') {
+        tile = e.srcElement.parentElement;
+    }
+    let id = parseInt(tile.id);
+    let r = Math.floor(id / game.columns), c = id % game.columns;
+    if (e.button == 0) {
+        game.open(r, c);
+        checkGame();
+    }
+    else if (e.button == 2) {
+        game.putFlag(r, c);
+    }
+}
+
+
 function startTimer() {
     timer = setInterval(function (params) {
         timeLabel.innerHTML = getTime();
@@ -209,6 +238,9 @@ function stopTimer() {
     clearInterval(timer);
     playPauseBtn.children[0].src = 'images/play-icon.svg';
     mainMenue.style.display = 'flex';
+    if(game.status!='game over'){
+        mainMenue.classList.add('pause-menue');
+    }
 }
 function getTime() {
     let seconds = time['seconds'], minutes = time['minutes'];
@@ -222,14 +254,24 @@ function getTime() {
 levelMenue.onchange = function (e) {
     let level = e.srcElement.value;
     bombsLabel.innerHTML = levels[level]['bombs'];
+    game=new Game(level);
 }
 newGameBtn.onclick = function () {
     game = new Game(levelMenue.value);
+    mainMenue.className = 'main-menue';
+    gameResult.innerHTML = 'minesweeper';
     mainMenue.style.display = 'none';
+    clearInterval(timer);
     startTimer();
     pause = false;
     time['seconds'] = 0;
     time['minutes'] = 0;
+}
+
+continueBtn.onclick = function () {
+    mainMenue.style.display = 'none';
+    pause = false;
+    startTimer();
 }
 let pause = true;
 playPauseBtn.onclick = function () {

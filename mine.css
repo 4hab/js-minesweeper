@@ -99,14 +99,25 @@ body{
     font-size: 1em;
     border: none;
 }
-.main-menue a{
+.continue-btn{
+    display: none;
+}
+.pause-menue .continue-btn:hover{
+    cursor: pointer;
+    color: rgb(24, 34, 46);
+    transition: linear 500ms;
+}
+.pause-menue .continue-btn{
     margin-top: 20px;
-    color: rgb(145, 0, 0);
+    color: rgb(255, 255, 255);
     font-weight: bold;
-    position: absolute;
-    top: 100px;
-    right: 100px;
+    display: block;
+}
 
+.result-menue h1{
+    color: rgb(255, 255, 255);
+    background-color: transparent;
+    box-shadow: none;
 }
 select:hover{
     cursor: pointer;
